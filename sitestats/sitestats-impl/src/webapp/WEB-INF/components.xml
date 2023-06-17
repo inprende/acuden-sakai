@@ -336,7 +336,7 @@
 
 		<!-- Specify db properties below if SAKAI_EVENT and SAKAI_SESSION tables lives on a different database of Sakai -->
 		<!--
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
         <property name="url" value="jdbc:mysql://127.0.0.1:3306/GEPUV?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true"/>
         <property name="username" value="dbuser"/>
         <property name="password" value="dbpassword"/>

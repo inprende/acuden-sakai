@@ -2280,7 +2280,7 @@
       <dependency>
           <groupId>com.mysql</groupId>
           <artifactId>mysql-connector-j</artifactId>
-          <version>8.0.32</version>
+          <version>8.0.33</version>
           <scope>provided</scope>
       </dependency>
       <dependency>
@@ -2529,7 +2529,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
-          <version>3.3.1</version>
+          <version>3.3.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
