@@ -25,8 +25,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
+
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserAlreadyDefinedException;
+import org.sakaiproject.user.api.UserEdit;
+import org.sakaiproject.user.api.UserLockedException;
+import org.sakaiproject.user.api.UserNotDefinedException;
+import org.sakaiproject.user.api.UserPermissionException;
 
 
 /**
@@ -103,10 +111,10 @@ public class SakaiPortalLogin extends AbstractWebService {
      * @ if there are any problems logging in.
      */
     @WebMethod
-    @Path("/loginAndCreate")
+    @Path("/loginAndCreateOrUpdate")
     @Produces("text/plain")
     @GET
-    public String loginAndCreate(
+    public String loginAndCreate (
             @WebParam(name = "id", partName = "id") @QueryParam("id") String id,
             @WebParam(name = "pw", partName = "pw") @QueryParam("pw") String pw,
             @WebParam(name = "firstName", partName = "firstName") @QueryParam("firstName") String firstName,
@@ -139,21 +147,51 @@ public class SakaiPortalLogin extends AbstractWebService {
         }
 
         User user = getSakaiUser(id);
-
+        
         if ( user == null && firstName != null && lastName != null && eMail != null ) {
-            log.debug("Creating Sakai Account...");
+            log.error("Creating Sakai Account...");
             try {
                 // Set password to something unguessable - they can set a new PW once they are logged in
                 String hiddenPW = idManager.createUuid();
                 userDirectoryService.addUser(null,id,firstName,lastName,eMail,hiddenPW,"registered", null);
-                            log.debug("User Created...");
+                log.debug("User Created...");
             } catch(Exception e) {
                 log.error("Unable to create user...");
                     throw new RuntimeException("Failed login");
             }
-                user = getSakaiUser(id);
+            user = getSakaiUser(id);
+            log.error("User created: {}", user); 
+        }
+        else {
+        	//User exists
+        	
+        	String current = StringUtils.join(user.getEmail(), user.getFirstName(), user.getLastName());
+        	String update = StringUtils.join(eMail, firstName, lastName);
+        	
+        	// If not equals, try to update user...
+        	if ( ! StringUtils.equals(current, update)) {
+        		try {
+        			log.error("Updating user with {}, {}, {}", user.getId(), user.getEmail(), user.getFirstName(), user.getLastName());
+        			UserEdit edit = userDirectoryService.editUser(user.getId());
+        			edit.setEmail(eMail);
+        			edit.setFirstName(firstName);
+        			edit.setLastName(lastName);
+        			
+        			try {
+        				userDirectoryService.commitEdit(edit);
+        				log.info("User updated successfully");
+        			} catch (UserAlreadyDefinedException e) {
+        				log.error("Error committing user edit transaction...", e);
+        				userDirectoryService.cancelEdit(edit);
+        			}
+        		} catch(UserNotDefinedException | UserPermissionException | UserLockedException e) {
+        			log.error("Error trying to edit user...", e);
+        		}
+        	}
         }
 
+        log.error("User is: {}", user);
+        
         if ( user != null ) {
             log.debug("Have User");
             Session s = sessionManager.startSession();
