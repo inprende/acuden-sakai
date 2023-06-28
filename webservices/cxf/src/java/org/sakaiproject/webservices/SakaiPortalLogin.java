@@ -100,13 +100,13 @@ public class SakaiPortalLogin extends AbstractWebService {
 
     /**
      * Login to an existing Sakai account with the Sakai user ID and shared portal secret. If the
-     * account doesn't exist it will be created.
+     * account doesn't exist it will be created, if user information differs from the existing account it will be updated.
      *
      * @param id Sakai user ID.
      * @param pw Shared portal secret.
-     * @param firstName The first name to use when creating the account.
-     * @param lastName The last name to use when creating the account.
-     * @param eMail The email to use when create that account.
+     * @param firstName The first name to use when creating or updating the account.
+     * @param lastName The last name to use when creating or updating the account.
+     * @param eMail The email to use when creating or updating that account.
      * @return Session ID of successful login.
      * @ if there are any problems logging in.
      */
@@ -147,6 +147,7 @@ public class SakaiPortalLogin extends AbstractWebService {
         }
 
         User user = getSakaiUser(id);
+        boolean userExists = false;
         
         if ( user == null && firstName != null && lastName != null && eMail != null ) {
             log.error("Creating Sakai Account...");
@@ -163,36 +164,13 @@ public class SakaiPortalLogin extends AbstractWebService {
             log.error("User created: {}", user); 
         }
         else {
-        	//User exists
-        	
-        	String current = StringUtils.join(user.getEmail(), user.getFirstName(), user.getLastName());
-        	String update = StringUtils.join(eMail, firstName, lastName);
-        	
-        	// If not equals, try to update user...
-        	if ( ! StringUtils.equals(current, update)) {
-        		try {
-        			log.error("Updating user with {}, {}, {}", user.getId(), user.getEmail(), user.getFirstName(), user.getLastName());
-        			UserEdit edit = userDirectoryService.editUser(user.getId());
-        			edit.setEmail(eMail);
-        			edit.setFirstName(firstName);
-        			edit.setLastName(lastName);
-        			
-        			try {
-        				userDirectoryService.commitEdit(edit);
-        				log.info("User updated successfully");
-        			} catch (UserAlreadyDefinedException e) {
-        				log.error("Error committing user edit transaction...", e);
-        				userDirectoryService.cancelEdit(edit);
-        			}
-        		} catch(UserNotDefinedException | UserPermissionException | UserLockedException e) {
-        			log.error("Error trying to edit user...", e);
-        		}
-        	}
+        	//Flag for updating purposes
+        	userExists = true;
         }
 
         log.error("User is: {}", user);
         
-        if ( user != null ) {
+        if ( user != null ) {skin
             log.debug("Have User");
             Session s = sessionManager.startSession();
             sessionManager.setCurrentSession(s);
@@ -208,6 +186,33 @@ public class SakaiPortalLogin extends AbstractWebService {
 
                 try {
                     String siteId = siteService.getUserSiteId(s.getUserId());
+                    
+                    if(userExists) {
+                    	String current = StringUtils.join(user.getEmail(), user.getFirstName(), user.getLastName());
+                    	String update = StringUtils.join(eMail, firstName, lastName);
+                    	
+                    	// If not equals, try to update user...
+                    	if ( ! StringUtils.equals(current, update)) {
+                    		try {
+                    			log.error("Updating user with {}, {}, {} and {}", user.getId(), user.getEmail(), user.getFirstName(), user.getLastName());
+                    			UserEdit edit = userDirectoryService.editUser(user.getId());
+                    			edit.setEmail(eMail);
+                    			edit.setFirstName(firstName);
+                    			edit.setLastName(lastName);
+                    			
+                    			try {
+                    				userDirectoryService.commitEdit(edit);
+                    				log.info("User updated successfully");
+                    			} catch (UserAlreadyDefinedException e) {
+                    				log.error("Error committing user update transaction...", e);
+                    				userDirectoryService.cancelEdit(edit);
+                    			}
+                    		} catch(UserNotDefinedException | UserPermissionException | UserLockedException e) {
+                    			log.error("Error trying to update user...", e);
+                    		}
+                    	}
+                    }
+                    
                     log.debug("Site exists..."+siteId);
                 } catch(Exception e) {
                     log.debug("Site does not exist...");
