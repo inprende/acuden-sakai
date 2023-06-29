@@ -27,3 +27,4 @@ rsf/sakai-rsf-web/test/overlays
 assets
 library/src/morpheus-master/
 library/src/webapp/skin/morpheus-default/
+.factorypath
