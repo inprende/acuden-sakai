@@ -19,10 +19,12 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -135,14 +137,14 @@ public class SakaiPortalLogin extends AbstractWebService {
 
         if ( portalSecret == null || pw == null || portalSecret.equals("") || ! portalSecret.equals(pw) ) {
             log.info("SakaiPortalLogin secret mismatch ip="+ipAddress);
-                    throw new RuntimeException("Failed login");
+                    throw new WebApplicationException("Failed login", Response.Status.FORBIDDEN);
         }
 
         // Verify that this IP address matches our string
         if ( "true".equalsIgnoreCase(ipCheck) ) {
             if (  portalIPs == null || portalIPs.equals("") ||  portalIPs.indexOf(ipAddress) == -1 ) {
                 log.info("SakaiPortalLogin Trusted IP not found");
-                        throw new RuntimeException("Failed login");
+                	throw new WebApplicationException("Failed login", Response.Status.FORBIDDEN);
             }
         }
 
@@ -158,7 +160,7 @@ public class SakaiPortalLogin extends AbstractWebService {
                 log.debug("User Created...");
             } catch(Exception e) {
                 log.error("Unable to create user...");
-                    throw new RuntimeException("Failed login");
+                    throw new WebApplicationException("Failed login", Response.Status.FORBIDDEN);
             }
             user = getSakaiUser(id);
             log.error("User created: {}", user); 
@@ -168,15 +170,14 @@ public class SakaiPortalLogin extends AbstractWebService {
         	userExists = true;
         }
 
-        log.error("User is: {}", user);
+        log.info("User is: {}", user);
         
-        if ( user != null ) {skin
-            log.debug("Have User");
+        if ( user != null ) {
             Session s = sessionManager.startSession();
             sessionManager.setCurrentSession(s);
             if (s == null) {
-                log.warn("Web Services Login failed to establish session for id="+id+" ip="+ipAddress);
-                throw new RuntimeException("Unable to establish session");
+                log.warn("Web Services Login failed to establish session for id={} ip={}", id, ipAddress);
+                throw new WebApplicationException("Unable to establish session", Response.Status.FORBIDDEN);
             } else {
                 // We do not care too much on the off-chance that this fails - folks simply won't show up in presense
                 // and events won't be trackable back to people / IP Addresses - but if it fails - there is nothing
@@ -213,17 +214,17 @@ public class SakaiPortalLogin extends AbstractWebService {
                     	}
                     }
                     
-                    log.debug("Site exists..."+siteId);
+                    log.info("Site exists... {}", siteId);
                 } catch(Exception e) {
-                    log.debug("Site does not exist...");
-                        throw new RuntimeException("Failed login");
+                    log.error("Site does not exist...");
+                        throw new WebApplicationException("Failed login", Response.Status.FORBIDDEN);
                 }
-                if ( log.isDebugEnabled() ) log.debug("Sakai Portal Login id="+id+" ip="+ipAddress+" session="+s.getId());
+                if ( log.isDebugEnabled() ) log.debug("Sakai Portal Login id={} ip={} session={}", id, ipAddress, s.getId());
                     return s.getId();
             }
         }
-        log.info("SakaiPortalLogin Failed ip="+ipAddress);
-            throw new RuntimeException("Failed login");
+        log.info("SakaiPortalLogin Failed ip={}", ipAddress);
+        	throw new WebApplicationException("Failed login", Response.Status.FORBIDDEN);
     }
 
     /**
