@@ -66,9 +66,9 @@ function removeOptionalAttributeBlock(elem) {
 							<input class="form-control sakai-glow" type="text" name="eid" id="user_eid" placeholder="$tlang.getString("useconrem.useid.placeholder")" oninput="USER.validateUserId();" onkeyup="USER.validateUserId();" autocomplete="username" #if($!valueEid)value="$formattedText.escapeHtml($!valueEid)"#end/>
 						#else
 							## modifying existing account
-							#if($!superUser)
-								## only admin type user can modify the eid field
-								<input class="form-control sakai-glow" type="text" name="eid" id="user_eid" placeholder="$tlang.getString("useconrem.useid.placeholder")" oninput="USER.validateUserId();" onkeyup="USER.validateUserId();" autocomplete="off" #if($!valueEid)value="$formattedText.escapeHtml($!valueEid)"#end/>
+							#if($!superUserss) ## explicitly wrong variable to force else block for label
+								## no one can can modify the eid field
+								## <input class="form-control sakai-glow" type="text" name="eid" id="user_eid" placeholder="$tlang.getString("useconrem.useid.placeholder")" oninput="USER.validateUserId();" onkeyup="USER.validateUserId();" autocomplete="off" #if($!valueEid)value="$formattedText.escapeHtml($!valueEid)"#end/>
 							#else
 								<span id="eidValue">$formattedText.escapeHtml($!valueEid)</span>
 							#end

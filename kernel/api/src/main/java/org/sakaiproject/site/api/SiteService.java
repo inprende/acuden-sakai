@@ -1441,4 +1441,21 @@ public interface SiteService extends EntityProducer
 	 * @return true if the stealthed tool is present in the given site; false otherwise
 	 */
 	public boolean isStealthedToolPresent(Site site, String toolID);
+	
+	/**
+	 * 
+	 * 
+	 * @param userId the user id to link to the site
+	 * @param site the site to to add the user to
+	 */
+	public void addUserToSite(String userId, Site site);
+	
+	/**
+	 * 
+	 * @param userId the userId to verify membership to the site
+	 * @param site the site to check user's membership
+	 * @return
+	 */
+	public boolean isSiteMember(String userId, Site site);
+	
 }

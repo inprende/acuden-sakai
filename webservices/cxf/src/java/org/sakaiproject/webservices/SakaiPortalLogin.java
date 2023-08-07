@@ -19,17 +19,17 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
-
+import org.sakaiproject.event.api.UsageSessionService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserAlreadyDefinedException;
@@ -37,6 +37,8 @@ import org.sakaiproject.user.api.UserEdit;
 import org.sakaiproject.user.api.UserLockedException;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.api.UserPermissionException;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -117,46 +119,22 @@ public class SakaiPortalLogin extends AbstractWebService {
     @Produces("text/plain")
     @GET
     public String loginAndCreate (
+    		@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization,
             @WebParam(name = "id", partName = "id") @QueryParam("id") String id,
-            @WebParam(name = "pw", partName = "pw") @QueryParam("pw") String pw,
             @WebParam(name = "firstName", partName = "firstName") @QueryParam("firstName") String firstName,
             @WebParam(name = "lastName", partName = "lastName") @QueryParam("lastName") String lastName,
             @WebParam(name = "eMail", partName = "eMail") @QueryParam("eMail") String eMail) {
 
-        String ipAddress = getUserIp();
-
-        String portalSecret = serverConfigurationService.getString("webservice.portalsecret");
-        String portalIPs = serverConfigurationService.getString("webservice.portalIP");
-        String ipCheck = serverConfigurationService.getString("webservice.IPCheck");
-
-        if (log.isDebugEnabled()) {
-            log.debug("SakaiPortalLogin.loginAndCreate id="+id);
-            log.debug("SakaiPortalLogin.loginAndCreate ip="+ipAddress+" portalIP="+portalIPs+" IPCheck="+ipCheck);
-            log.debug("        fn="+firstName+" ln="+lastName+" em="+eMail+" ip="+ipAddress);
-        }
-
-        if ( portalSecret == null || pw == null || portalSecret.equals("") || ! portalSecret.equals(pw) ) {
-            log.info("SakaiPortalLogin secret mismatch ip="+ipAddress);
-                    throw new WebApplicationException("Failed login", Response.Status.FORBIDDEN);
-        }
-
-        // Verify that this IP address matches our string
-        if ( "true".equalsIgnoreCase(ipCheck) ) {
-            if (  portalIPs == null || portalIPs.equals("") ||  portalIPs.indexOf(ipAddress) == -1 ) {
-                log.info("SakaiPortalLogin Trusted IP not found");
-                	throw new WebApplicationException("Failed login", Response.Status.FORBIDDEN);
-            }
-        }
+        String ipAddress = validateUserAddRequest(authorization);
 
         User user = getSakaiUser(id);
         boolean userExists = false;
         
-        if ( user == null && firstName != null && lastName != null && eMail != null ) {
+        if ( user == null && StringUtils.isNoneBlank(firstName, lastName, eMail)) {
             log.error("Creating Sakai Account...");
             try {
-                // Set password to something unguessable - they can set a new PW once they are logged in
-                String hiddenPW = idManager.createUuid();
-                userDirectoryService.addUser(null,id,firstName,lastName,eMail,hiddenPW,"registered", null);
+            	String hiddenPW = idManager.createUuid();
+                userDirectoryService.addUser(null, id, firstName, lastName, eMail, hiddenPW, "registered", null);
                 log.debug("User Created...");
             } catch(Exception e) {
                 log.error("Unable to create user...");
@@ -165,8 +143,7 @@ public class SakaiPortalLogin extends AbstractWebService {
             user = getSakaiUser(id);
             log.error("User created: {}", user); 
         }
-        else {
-        	//Flag for updating purposes
+        else if(user != null) {
         	userExists = true;
         }
 
@@ -183,7 +160,7 @@ public class SakaiPortalLogin extends AbstractWebService {
                 // and events won't be trackable back to people / IP Addresses - but if it fails - there is nothing
                 // we can do anyways.
 
-                usageSessionService.login(user.getId(), id, ipAddress, "SakaiPortalLogin.jws", usageSessionService.EVENT_LOGIN_WS);
+                usageSessionService.login(user.getId(), id, ipAddress, "SakaiPortalLogin.jws", UsageSessionService.EVENT_LOGIN_WS);
 
                 try {
                     String siteId = siteService.getUserSiteId(s.getUserId());
@@ -200,7 +177,6 @@ public class SakaiPortalLogin extends AbstractWebService {
                     			edit.setEmail(eMail);
                     			edit.setFirstName(firstName);
                     			edit.setLastName(lastName);
-                    			
                     			try {
                     				userDirectoryService.commitEdit(edit);
                     				log.info("User updated successfully");
@@ -235,15 +211,45 @@ public class SakaiPortalLogin extends AbstractWebService {
      * @return Session ID of successful login.
      * @ if there are any problems logging in.
      */
-
     @WebMethod
     @Path("/login")
     @Produces("text/plain")
     @GET
     public String login(
-            @WebParam(name = "id", partName = "id") @QueryParam("id") String id,
-            @WebParam(name = "pw", partName = "pw") @QueryParam("pw") String pw) {
+    		@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization,
+            @WebParam(name = "id", partName = "id") @QueryParam("id") String id){
         log.debug("SakaiPortalLogin.login()");
-        return loginAndCreate(id, pw, null, null, null);
+        return loginAndCreate(authorization, id, null, null, null);
     }
+    
+    private String validateUserAddRequest(String authorization) {
+		if (StringUtils.isBlank(authorization)) {
+			throw new WebApplicationException("Bad request...", Response.Status.BAD_REQUEST);
+		}
+		return validateRequest(authorization);
+	}
+
+	private String validateRequest(String authorization) {
+
+		String ipAddress = getUserIp();
+		String portalSecret = serverConfigurationService.getString("webservice.portalsecret");
+		String portalIPs = serverConfigurationService.getString("webservice.portalIP");
+		String ipCheck = serverConfigurationService.getString("webservice.IPCheck");
+
+		// userDirectoryService. 7T17SMT2B04RP9T
+		if (StringUtils.isAnyBlank(portalSecret, authorization) || !portalSecret.equals(authorization)) {
+			log.info("SakaiPortalLogin secret mismatch ip=" + ipAddress);
+			throw new WebApplicationException("Failed login", Response.Status.UNAUTHORIZED);
+		}
+
+		// Verify that this IP address matches our string
+		if ("true".equalsIgnoreCase(ipCheck)) {
+			if (StringUtils.isBlank(portalIPs) || portalIPs.indexOf(ipAddress) == -1) {
+				log.info("SakaiPortalLogin Trusted IP not found");
+				throw new WebApplicationException("Failed login", Response.Status.FORBIDDEN);
+			}
+		}
+		return ipAddress;
+	}
+    
 }

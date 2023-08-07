@@ -37,6 +37,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sakaiproject.db.api.SqlReader;
 import org.sakaiproject.db.api.SqlReaderFinishedException;
@@ -2622,7 +2623,31 @@ public abstract class DbSiteService extends BaseSiteService
 		{
 			return fullSiteReader.readSqlResultRecord(result);
 		}
+		
+		public void addUserToSite(String userId, Site site) {
+			String statement = siteServiceSql.getInsertUserSql();
+			Object[] fields = new Object[3];
+			fields[0] = site.getId();
+			fields[1] = userId;
+			fields[2] = Integer.valueOf(1);
+			m_sql.dbWrite(statement, fields);
+		}
+		
+		public boolean isSiteMember(String userId, Site site) {
+			
+			String statement = siteServiceSql.getCheckIfUserIdBelongsOnSiteSql();
+			Object[] fields = new Object[2];
+			fields[0] = userId;
+			fields[1] = site.getId();
 
+			List<Object> result = m_sql.dbRead(statement, fields, new SqlReader<Object>(){
+				@Override
+				public Object readSqlResultRecord(ResultSet result) throws SqlReaderFinishedException {
+					return result;
+				}
+			});
+			return CollectionUtils.isNotEmpty(result) && result.size() == 1;
+		}
 	}
 
 	/**

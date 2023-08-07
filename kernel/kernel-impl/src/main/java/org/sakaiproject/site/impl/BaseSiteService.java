@@ -3500,6 +3500,11 @@ public abstract class BaseSiteService implements SiteService, Observer
 		 * @return List of Sites or empty list if none.
 		 */
 		public List<Site> getSoftlyDeletedSites();
+		
+		
+		public void addUserToSite(String userId, Site site);
+		
+		public boolean isSiteMember(String userId, Site site);
 	}
 
 	/**
@@ -3925,5 +3930,17 @@ public abstract class BaseSiteService implements SiteService, Observer
 		}
 
 		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addUserToSite(String userId, Site site) {
+		m_storage.addUserToSite(userId, site);
+	}
+	
+	public boolean isSiteMember(String userId, Site site) {
+		return m_storage.isSiteMember(userId, site);
 	}
 }

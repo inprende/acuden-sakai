@@ -151,6 +151,36 @@
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+  			<artifactId>jackson-jaxrs-json-provider</artifactId>
+  			<version>${sakai.jackson.version}</version>
+		</dependency> 
         <!-- SAK-27503 we do not want aopalliance JAR deployed in our WAR! -->
         <dependency>
             <groupId>aopalliance</groupId>
@@ -192,6 +222,11 @@
             <groupId>org.sakaiproject.sitemanage</groupId>
             <artifactId>sakai-site-manage-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.sakaiproject.samigo</groupId>
+        	<artifactId>samigo-hibernate</artifactId>
+        	<version>24-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

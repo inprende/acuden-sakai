@@ -384,6 +384,8 @@ public interface SiteServiceSql
 	 * returns part of the where clause to retrieve sites that are unpublished
 	 */
 	String getUnpublishedSitesOnlySql();
+	
+	String getCheckIfUserIdBelongsOnSiteSql();
 
 	/**
 	 * returns the sql statement which unpublishes multiple sites in the sakai_site table

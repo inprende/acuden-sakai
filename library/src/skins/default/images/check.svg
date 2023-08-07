@@ -1,45 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   id="svg8"
-   version="1.1"
-   viewBox="0 0 100 100"
-   height="100mm"
-   width="100mm">
-  <defs
-     id="defs2">
-    <linearGradient
-       osb:paint="solid"
-       id="linearGradient4522">
-      <stop
-         id="stop4520"
-         offset="0"
-         style="stop-color:#000000;stop-opacity:1;" />
-    </linearGradient>
-  </defs>
-  <metadata
-     id="metadata5">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     transform="translate(0,-197)"
-     id="layer1">
-    <path
-       id="path4526"
-       d="m 6.0400348,247.50212 31.2820192,28.36196 56.11075,-63.01432"
-       style="fill:none;stroke:#ffffff;stroke-opacity:1;stroke-width:11.6;stroke-miterlimit:4;stroke-dasharray:none" />
-  </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.2.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg8" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:osb="http://www.openswatchbook.org/uri/2009/osb" xmlns:svg="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 283.5 283.5"
+	 style="enable-background:new 0 0 283.5 283.5;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+</style>
+<path class="st0" d="M276.9,46.9c7.9,7.9,7.9,20.7,0,28.5L115.7,236.6c-7.9,7.9-20.7,7.9-28.5,0L6.6,156c-7.9-7.9-7.9-20.7,0-28.5
+	s20.7-7.9,28.5,0l66.4,66.3l147-146.9C256.3,39,269.1,39,276.9,46.9L276.9,46.9z"/>
 </svg>

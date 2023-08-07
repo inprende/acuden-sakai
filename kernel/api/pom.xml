@@ -174,7 +174,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-parameter-names</artifactId>
-            <version>${sakai.jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -184,5 +183,10 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
-    </dependencies>
+        <dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+  			<artifactId>jackson-jaxrs-json-provider</artifactId>
+  			<version>${sakai.jackson.version}</version>
+		</dependency> 
+	</dependencies>
 </project>

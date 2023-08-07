@@ -1797,6 +1797,7 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 		if (rcontext.uses(INCLUDE_LOGIN))
 		{
 
+			rcontext.put("homeLoginUrl", StringUtils.trimToNull(ServerConfigurationService.getString("login.url")));
 			// for the main login/out link
 			String logInOutUrl = RequestFilter.serverUrl(req);
 			String message = null;
@@ -1833,8 +1834,7 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 					+ "/login";
 
 					// let the login url be overridden by configuration
-					String overrideLoginUrl = StringUtils
-					.trimToNull(ServerConfigurationService.getString("login.url"));
+					String overrideLoginUrl = StringUtils.trimToNull(ServerConfigurationService.getString("login.url"));
 					if (overrideLoginUrl != null) logInOutUrl = overrideLoginUrl;
 
 					// check for a login text override
@@ -1904,6 +1904,8 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 			}
 			rcontext.put("userIsLoggedIn", session.getUserId() != null);
 			rcontext.put("loginTopLogin", Boolean.valueOf(topLogin));
+			rcontext.put("loginTopLogin", Boolean.valueOf(topLogin));
+			
 			rcontext.put("logoutWarningMessage", logoutWarningMessage);
 			rcontext.put("topLogin", topLogin);
 

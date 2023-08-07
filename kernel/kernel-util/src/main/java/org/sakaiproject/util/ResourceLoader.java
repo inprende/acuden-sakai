@@ -348,7 +348,7 @@ public class ResourceLoader extends DummyMap implements InternationalizedMessage
 	    	
 	    log.debug("Locale: " + loc.toString());
 
-	    return loc;
+	    return new Locale("es", "PR");
 	}
 	
 	/**

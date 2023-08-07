@@ -610,6 +610,14 @@ public class SiteServiceSqlDefault implements SiteServiceSql
 	public String getUnpublishedSitesOnlySql() {
 		return "SAKAI_SITE.PUBLISHED = '0' and ";
 	}
+	
+	/**
+	 * returns the sql statement which retrieves a record if the userId and siteId are present on sakai_site_user table.
+	 */
+	public String getCheckIfUserIdBelongsOnSiteSql()
+	{
+		return "select USER_ID, PERMISSION from SAKAI_SITE_USER " + "where USER_ID = ? AND SITE_ID = ?";
+	}
 
 	/**
 	 * @inheritDoc

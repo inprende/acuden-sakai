@@ -34,16 +34,28 @@ $enable-cssgrid: true;
 $offcanvas-box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175);
 
 // Customize some defaults
-$primary: #003a6b;
+//$primary: #003a6b;
+//$body-color: #333;
+//$body-bg: #fff;
+//$border-radius: .4rem;
+//$success: #7952b3;
+
+$primary: #002f56;
 $body-color: #333;
 $body-bg: #fff;
 $border-radius: .4rem;
-$success: #7952b3;
+$success: #ff6673;
 
 // Tool defaults
-$text-color: #333;
-$input-border-focus: #66afe9;
+//$text-color: #333;
+//$input-border-focus: #66afe9;
+//$input-border: var(--sakai-border-color);
+
+// Tool defaults
+$text-color: #000;
+$input-border-focus: #a7d02a;
 $input-border: var(--sakai-border-color);
+
 
 @import "defaults";
 @import "themes/base";

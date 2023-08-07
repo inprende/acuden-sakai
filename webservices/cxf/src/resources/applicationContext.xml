@@ -104,6 +104,15 @@
             <ref bean="org.sakaiproject.webservices.SakaiPortalLogin"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
+    
+    <jaxrs:server id="SiteServiceRS" address="/rest/siteService">
+        <jaxrs:serviceBeans>
+            <ref bean="org.sakaiproject.webservices.SiteService"/>
+        </jaxrs:serviceBeans>
+		<jaxrs:providers>
+           <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+        </jaxrs:providers>
+    </jaxrs:server>
 
     <jaxrs:server id="SakaiI18nRS" address="/rest/i18n">
         <jaxrs:serviceBeans>
@@ -247,6 +256,7 @@
     <bean id="org.sakaiproject.webservices.SakaiJob" class="org.sakaiproject.webservices.SakaiJob" parent="org.sakaiproject.webservices.AbstractWebService" />
     <bean id="org.sakaiproject.webservices.SakaiLogin" class="org.sakaiproject.webservices.SakaiLogin" parent="org.sakaiproject.webservices.AbstractWebService" />
     <bean id="org.sakaiproject.webservices.SakaiPortalLogin" class="org.sakaiproject.webservices.SakaiPortalLogin" parent="org.sakaiproject.webservices.AbstractWebService" />
+    <bean id="org.sakaiproject.webservices.SiteService" class="org.sakaiproject.webservices.SiteService" parent="org.sakaiproject.webservices.AbstractWebService" />
     <bean id="org.sakaiproject.webservices.SakaiI18n" class="org.sakaiproject.webservices.SakaiI18n" parent="org.sakaiproject.webservices.AbstractWebService" />
     <bean id="org.sakaiproject.webservices.SakaiScript" class="org.sakaiproject.webservices.SakaiScript" parent="org.sakaiproject.webservices.AbstractWebService" />
     <bean id="org.sakaiproject.webservices.ShortenedUrl" class="org.sakaiproject.webservices.ShortenedUrl" parent="org.sakaiproject.webservices.AbstractWebService" />
