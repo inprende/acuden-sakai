@@ -28,3 +28,4 @@ assets
 library/src/morpheus-master/
 library/src/webapp/skin/morpheus-default/
 .factorypath
+build/
