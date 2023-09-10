@@ -12,9 +12,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @XmlRootElement(name = "SiteDTO")
-public class SiteDTO {
+public class ModuleDTO {
 
 	private String id;
+	private String siteId;
 	private String url;
 	private String description;
 	private String infoUrl;
@@ -27,9 +28,9 @@ public class SiteDTO {
 	boolean pubView;
 	private Date createdDate;
 	private Date modifiedDate;
-	private String moduleId;
+	
+	private int position;
 	private String moduleTitle;
-	private String moduleUrl;
-	private int moduleOrder;
+	private String moduleTitleCustom;
 	
 }

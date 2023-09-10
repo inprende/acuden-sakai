@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 
 import javax.jws.WebParam;
@@ -48,6 +47,9 @@ import lombok.extern.slf4j.Slf4j;
 @SOAPBinding(style = SOAPBinding.Style.RPC, use = SOAPBinding.Use.LITERAL)
 @Slf4j
 public class SiteService extends AbstractWebService {
+	
+	private final String SITE_MATCH = "ACUDEN Academy LMS";
+	private final String MODULE_MATCH = "Módulo ";
 
 	private final ModelMapper modelMapper = new ModelMapper();
 	private final PublishedAssessmentService assessmentService = new PublishedAssessmentService();
@@ -63,7 +65,7 @@ public class SiteService extends AbstractWebService {
 		return user;
 	}
 
-	@Path("/sites")
+	@Path("/siteModules")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -73,20 +75,26 @@ public class SiteService extends AbstractWebService {
 		log.info("Client ip: {}", ipAddress);
 
 		try {
-			List<SiteDTO> responseSites = new ArrayList<>();
-			List<Site> pagedSites = siteService.getSites(SelectionType.NON_USER, "course", null, null, SortType.ID_ASC, null);
-
+			List<SiteDTO> responseSitesModules = new ArrayList<>();
+			List<Site> pagedSites = siteService.getSites(SelectionType.JOINABLE, "course", SITE_MATCH, null, SortType.ID_ASC, null);
 			pagedSites.stream().filter(Site::isPublished).forEach(site -> {
-				responseSites.add(toSiteDTO(site));
+				site.getPages().stream().filter(sp -> sp.getTitle().contains(MODULE_MATCH)).forEach(module -> {
+					SiteDTO dto = toSiteDTO(site);
+					dto.setModuleId(module.getId());
+					dto.setModuleTitle(module.getTitle());
+					dto.setModuleUrl(module.getUrl());
+					dto.setModuleOrder(module.getPosition());
+					responseSitesModules.add(dto);
+				});
 			});
-			return responseSites;
+			return responseSitesModules;
 		} catch (Exception e) {
 			log.error("Error searching for sites...");
 			throw new WebApplicationException("Failed processing sites", Response.Status.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@Path("/site")
+	@Path("/siteModule")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -133,11 +141,11 @@ public class SiteService extends AbstractWebService {
 		return toSiteDTO(site);
 	}
 	
-	@Path("/grade")
+	@Path("/siteModuleGrades")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public CourseGrade getCourseGrade(@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization,
+	public List<CourseGrade> getCourseGrade(@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization,
 			@WebParam(name = "id", partName = "id") @QueryParam("id") String id,
 			@WebParam(name = "siteId", partName = "siteId") @QueryParam("siteId") String siteId) {
 		
@@ -164,12 +172,9 @@ public class SiteService extends AbstractWebService {
 
 		List<AssessmentGradingData> list = assessmentService.getAllAssessmentsGradingDataByAgentAndSiteId(user.getId(), site.getId());
 		
-		CourseGrade grade = getCourseGrade(list).orElseThrow(() -> { 
-			throw new WebApplicationException("Invalid request", Response.Status.NOT_FOUND);
-		});
-		grade.setCourse(toSiteDTO(site));
+		List<CourseGrade> grades = getCourseGrades(list, toSiteDTO(site));
 		
-		return grade;
+		return grades;
 	}	
 	
 	@Path("/process")
@@ -232,8 +237,7 @@ public class SiteService extends AbstractWebService {
 		return modelMapper.map(site, SiteDTO.class);
 	}
 	
-	private Optional<CourseGrade> getCourseGrade(List<AssessmentGradingData> list) {
-
+	private List<CourseGrade> getCourseGrades(List<AssessmentGradingData> list, SiteDTO siteDTO) {
 		List<CourseGrade> dataList = new ArrayList<>();
 		for (AssessmentGradingData agd : list) {
 
@@ -269,14 +273,9 @@ public class SiteService extends AbstractWebService {
 			sad.setCorrect(finalScore);
 			sad.setTotal(maxScore);
 			sad.setGradeAvailable(availableGrade);
+			sad.setCourse(siteDTO);
 			dataList.add(sad);
 		}
-		
-		if(dataList.size() >= 1) {
-			return Optional.of(dataList.get(0));
-		}
-		else {
-			return Optional.empty();
-		}
+		return dataList;
 	}
 }
