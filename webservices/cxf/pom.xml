@@ -226,7 +226,10 @@
         <dependency>
         	<groupId>org.sakaiproject.samigo</groupId>
         	<artifactId>samigo-hibernate</artifactId>
-        	<version>24-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.sakaiproject.portal</groupId>
+        	<artifactId>sakai-portal-api</artifactId>
         </dependency>
     </dependencies>
 
